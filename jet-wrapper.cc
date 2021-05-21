@@ -98,7 +98,7 @@ using Monge_form = Monge_jet_fitting::Monge_form;
 std::vector<JetData> fit(const PointVector &points, const Nearest &nearest, size_t degree) {
   size_t n = points.size();
   std::vector<JetData> result(n);
-// #pragma omp parallel for
+#pragma omp parallel for
   for (size_t i = 0; i < n; ++i) {
     auto samples = conv(nearest(points[i]));
     Monge_jet_fitting monge_fit;

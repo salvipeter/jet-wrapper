@@ -17,8 +17,11 @@ int main(int argc, char **argv) {
   for (const auto &tri : mesh.triangles()) {
     auto n = ((points[tri[1]] - points[tri[0]]) ^ (points[tri[2]] - points[tri[0]])).normalize();
     for (size_t i = 0; i < 3; ++i)
-      if (n * jet[tri[i]].normal < 0)
+      if (n * jet[tri[i]].normal < 0) {
         jet[tri[i]].normal *= -1;
+        jet[tri[i]].k_min *= -1;
+        jet[tri[i]].k_max *= -1;
+      }
   }
 
   std::ofstream f("output.vtk");
@@ -39,11 +42,19 @@ int main(int argc, char **argv) {
   f << "SCALARS k_max float 1" << std::endl;
   f << "LOOKUP_TABLE default" << std::endl;
   for (size_t i = 0; i < n; ++i)
-    f << jet[i].k_max << std::endl;
+    f << -jet[i].k_max << std::endl;
   f << "SCALARS k_min float 1" << std::endl;
   f << "LOOKUP_TABLE default" << std::endl;
   for (size_t i = 0; i < n; ++i)
-    f << jet[i].k_min << std::endl;
+    f << -jet[i].k_min << std::endl;
+  f << "SCALARS mean float 1" << std::endl;
+  f << "LOOKUP_TABLE default" << std::endl;
+  for (size_t i = 0; i < n; ++i)
+    f << -(jet[i].k_min + jet[i].k_max) / 2 << std::endl;
+  f << "SCALARS gaussian float 1" << std::endl;
+  f << "LOOKUP_TABLE default" << std::endl;
+  for (size_t i = 0; i < n; ++i)
+    f << jet[i].k_min * jet[i].k_max << std::endl;
   f << "NORMALS d_max float" << std::endl;
   for (size_t i = 0; i < n; ++i)
     f << jet[i].d_max << std::endl;
